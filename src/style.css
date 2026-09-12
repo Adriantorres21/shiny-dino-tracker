@@ -71,6 +71,7 @@ body {
 
 .login-header {
   margin-bottom: 28px;
+
   text-align: center;
 }
 
@@ -189,7 +190,6 @@ body {
   border-radius: 8px;
 
   background: rgba(239, 68, 68, 0.08);
-
   color: #f87171;
 
   font-size: 13px;
@@ -239,11 +239,9 @@ body {
   position: sticky;
 
   top: 10px;
-
   z-index: 20;
 
   margin-bottom: 16px;
-
   padding: 14px;
 
   border: 1px solid #252a34;
@@ -386,6 +384,7 @@ body {
 
 .update-button:hover:not(:disabled) {
   background: #4338ca;
+
   border-color: #4338ca;
 }
 
@@ -393,7 +392,6 @@ body {
   border: 1px solid rgba(239, 68, 68, 0.35);
 
   background: rgba(239, 68, 68, 0.1);
-
   color: #ef4444;
 }
 
@@ -545,7 +543,6 @@ body {
   border-radius: 6px;
 
   background: #181c23;
-
   color: #aeb6c3;
 
   font-size: 17px;
@@ -556,6 +553,7 @@ body {
 
 .floating-control-close:hover {
   background: #222731;
+
   color: white;
 }
 
@@ -582,7 +580,6 @@ body {
 
 .control-map-count {
   display: inline-flex;
-
   align-items: center;
   justify-content: center;
 
@@ -594,7 +591,6 @@ body {
   border-radius: 5px;
 
   background: #242a34;
-
   color: #9ca3af;
 
   font-size: 10px;
@@ -617,7 +613,6 @@ body {
   border-radius: 6px;
 
   background: #181c23;
-
   color: #9da6b4;
 
   font-size: 10px;
@@ -628,6 +623,7 @@ body {
 
 .map-action-button:hover {
   background: #222731;
+
   color: #e5e7eb;
 }
 
@@ -645,13 +641,11 @@ body {
 
 .map-filter-button {
   display: flex;
-
   align-items: center;
 
   gap: 8px;
 
   width: 100%;
-
   min-height: 30px;
 
   padding: 5px 8px;
@@ -660,7 +654,6 @@ body {
   border-radius: 6px;
 
   background: transparent;
-
   color: #737c8c;
 
   font-size: 11px;
@@ -695,8 +688,7 @@ body {
   flex-shrink: 0;
 }
 
-.map-filter-button.active
-.map-filter-indicator {
+.map-filter-button.active .map-filter-indicator {
   background: #6366f1;
 
   box-shadow:
@@ -714,7 +706,6 @@ body {
   height: 36px;
 
   display: flex;
-
   align-items: center;
 
   gap: 7px;
@@ -725,7 +716,6 @@ body {
   border-radius: 8px;
 
   background: rgba(19, 22, 28, 0.96);
-
   color: #aeb6c3;
 
   font-size: 12px;
@@ -739,6 +729,7 @@ body {
 
 .show-controls-button:hover {
   background: #222731;
+
   color: #f3f4f6;
 }
 
@@ -752,7 +743,6 @@ body {
 
 .map-section-header {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
 
@@ -761,7 +751,6 @@ body {
 
 .map-section-title {
   display: flex;
-
   align-items: center;
 
   gap: 8px;
@@ -778,7 +767,6 @@ body {
 
 .map-count {
   display: inline-flex;
-
   align-items: center;
   justify-content: center;
 
@@ -806,19 +794,27 @@ body {
 .dino-grid {
   display: grid;
 
+  /*
+   * Aumentado de 220px a 280px
+   * para permitir nombres largos.
+   */
   grid-template-columns:
-    repeat(auto-fill, minmax(220px, 1fr));
+    repeat(auto-fill, minmax(280px, 1fr));
 
-  gap: 10px;
+  gap: 12px;
 }
+
+/* =========================
+   DINO CARD
+   ========================= */
 
 .dino-card {
   position: relative;
 
   min-width: 0;
-  min-height: 88px;
+  min-height: 100px;
 
-  padding: 16px 16px 14px;
+  padding: 18px 18px 16px;
 
   overflow: hidden;
 
@@ -849,19 +845,19 @@ body {
    ========================= */
 
 .dino-card:hover {
-  border-color: #4b5568;
+  border-color: #6366f1;
 
   background:
     linear-gradient(
       145deg,
-      #1d222c 0%,
-      #171b23 100%
+      #202532 0%,
+      #191e28 100%
     );
 
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 
   box-shadow:
-    0 8px 22px rgba(0, 0, 0, 0.28);
+    0 8px 24px rgba(0, 0, 0, 0.30);
 }
 
 /* =========================
@@ -895,13 +891,15 @@ body {
   background:
     linear-gradient(
       145deg,
-      rgba(99, 102, 241, 0.40) 0%,
-      rgba(79, 70, 229, 0.25) 100%
+      rgba(99, 102, 241, 0.45) 0%,
+      rgba(79, 70, 229, 0.30) 100%
     );
+
+  transform: translateY(-4px);
 
   box-shadow:
     0 0 0 1px rgba(129, 140, 248, 0.35),
-    0 10px 28px rgba(79, 70, 229, 0.28);
+    0 10px 30px rgba(79, 70, 229, 0.30);
 }
 
 /* =========================
@@ -929,11 +927,17 @@ body {
 
   transition:
     opacity 0.18s ease,
-    height 0.18s ease;
+    height 0.18s ease,
+    background 0.18s ease;
 }
 
-.dino-card.selected
-.dino-card-accent {
+.dino-card:hover .dino-card-accent {
+  height: 4px;
+
+  opacity: 1;
+}
+
+.dino-card.selected .dino-card-accent {
   height: 4px;
 
   opacity: 1;
@@ -960,7 +964,12 @@ body {
 .dino-name {
   margin: 0;
 
-  overflow: hidden;
+  /*
+   * Se eliminó el ellipsis.
+   * Los nombres largos ahora pueden
+   * ocupar varias líneas.
+   */
+  overflow: visible;
 
   color: #f1f5f9;
 
@@ -969,16 +978,19 @@ body {
 
   line-height: 1.4;
 
-  white-space: nowrap;
+  white-space: normal;
 
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 
   transition:
     color 0.18s ease;
 }
 
-.dino-card.selected
-.dino-name {
+.dino-card:hover .dino-name {
+  color: #ffffff;
+}
+
+.dino-card.selected .dino-name {
   color: #ffffff;
 }
 
@@ -988,7 +1000,6 @@ body {
 
 .dino-coordinates {
   display: flex;
-
   align-items: center;
 
   flex-wrap: wrap;
@@ -1020,94 +1031,24 @@ body {
     color 0.18s ease;
 }
 
-.dino-card.selected
-.dino-coordinates {
+.dino-card:hover .dino-coordinates {
+  color: #cbd5e1;
+}
+
+.dino-card.selected .dino-coordinates {
   color: #c7d2fe;
 }
 
-.dino-card.selected
-.dino-coordinates span {
+.dino-card.selected .dino-coordinates span {
   color: #a5b4fc;
 }
 
-.dino-coordinates
-.coordinate-separator {
+.dino-coordinates .coordinate-separator {
   margin: 0 7px;
 
   color: #4b5563;
 
   font-size: 11px;
-}
-
-/* =========================
-   DINO NAME TOOLTIP
-   ========================= */
-
-.dino-name-tooltip {
-  position: absolute;
-
-  left: 0;
-  bottom: calc(100% + 7px);
-
-  z-index: 50;
-
-  max-width: min(420px, 70vw);
-
-  padding: 7px 9px;
-
-  border: 1px solid #343b48;
-  border-radius: 6px;
-
-  background: #20242c;
-
-  color: #f3f4f6;
-
-  font-size: 11px;
-  font-weight: 500;
-
-  line-height: 1.4;
-
-  white-space: normal;
-
-  overflow-wrap: anywhere;
-
-  box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.4);
-
-  opacity: 0;
-
-  visibility: hidden;
-
-  pointer-events: none;
-
-  transform: translateY(3px);
-
-  transition:
-    opacity 0.15s ease,
-    visibility 0.15s ease,
-    transform 0.15s ease;
-}
-
-.dino-name-tooltip::after {
-  content: "";
-
-  position: absolute;
-
-  left: 12px;
-  top: 100%;
-
-  border: 5px solid transparent;
-
-  border-top-color: #343b48;
-}
-
-.dino-name-wrapper:hover
-.dino-name-tooltip {
-  opacity: 1;
-
-  visibility: visible;
-
-  transform: translateY(0);
 }
 
 /* =========================
@@ -1135,7 +1076,6 @@ body {
 
 .dino-search-header {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
 
@@ -1172,7 +1112,6 @@ body {
   border-radius: 6px;
 
   background: #20252e;
-
   color: #aeb6c3;
 
   font-size: 11px;
@@ -1218,7 +1157,6 @@ body {
   outline: none;
 
   background: #0f1218;
-
   color: #f3f4f6;
 
   font-size: 13px;
@@ -1275,7 +1213,6 @@ body {
 
 .empty-filter-state {
   display: flex;
-
   align-items: center;
   justify-content: center;
 
@@ -1300,7 +1237,6 @@ body {
   border-radius: 6px;
 
   background: #1b1f27;
-
   color: #cbd5e1;
 
   font-size: 11px;
@@ -1321,7 +1257,6 @@ body {
   min-height: 130px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
@@ -1360,7 +1295,6 @@ body {
   border-radius: 6px;
 
   background: #1b1f27;
-
   color: #cbd5e1;
 
   font-size: 11px;

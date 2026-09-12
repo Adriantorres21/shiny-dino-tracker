@@ -550,12 +550,6 @@ function toggleDinoSelection(
               >
                 {{ dino.name }}
               </h3>
-
-              <div
-                class="dino-name-tooltip"
-              >
-                {{ dino.name }}
-              </div>
             </div>
 
             <div
