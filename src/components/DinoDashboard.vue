@@ -22,6 +22,12 @@ const visibleMaps =
 const initialized =
   ref(false)
 
+const searchText =
+  ref('')
+
+const selectedDinos =
+  ref<Set<string>>(new Set())
+
 const maps = computed(() => {
   const mapSet =
     new Set<string>()
@@ -108,6 +114,24 @@ function hideAllMaps() {
     new Set()
 }
 
+const filteredDinos = computed(() => {
+  const search =
+    searchText.value
+      .trim()
+      .toLowerCase()
+
+  if (!search) {
+    return props.result.dinos
+  }
+
+  return props.result.dinos.filter(
+    dino =>
+      dino.name
+        .toLowerCase()
+        .includes(search)
+  )
+})
+
 const dinosByMap =
   computed(() => {
     const groups =
@@ -118,7 +142,7 @@ const dinosByMap =
 
     for (
       const dino
-      of props.result.dinos
+      of filteredDinos.value
     ) {
       if (
         !isMapVisible(dino.map)
@@ -154,10 +178,60 @@ function formatCoordinate(
 
   return value.toFixed(2)
 }
+
+function clearSearch() {
+  searchText.value = ''
+}
+
+function getDinoKey(
+  dino: typeof props.result.dinos[number]
+) {
+  return [
+    dino.name,
+    dino.map,
+    dino.latitude ?? '',
+    dino.longitude ?? '',
+  ]
+    .join('|')
+    .toLowerCase()
+}
+
+function isDinoSelected(
+  dino: typeof props.result.dinos[number]
+) {
+  return selectedDinos.value.has(
+    getDinoKey(dino)
+  )
+}
+
+function toggleDinoSelection(
+  dino: typeof props.result.dinos[number]
+) {
+  const next =
+    new Set(
+      selectedDinos.value
+    )
+
+  const key =
+    getDinoKey(dino)
+
+  if (next.has(key)) {
+    next.delete(key)
+  } else {
+    next.add(key)
+  }
+
+  selectedDinos.value =
+    next
+}
 </script>
 
 <template>
   <section class="dashboard">
+
+    <!-- =========================
+         CONTROLES DE MAPA
+         ========================= -->
 
     <div
       v-if="controlsVisible"
@@ -199,7 +273,9 @@ function formatCoordinate(
         <div
           class="control-section-header"
         >
-          <span>Mapas</span>
+          <span>
+            Mapas
+          </span>
 
           <span
             class="control-map-count"
@@ -267,6 +343,10 @@ function formatCoordinate(
       <span>☰</span>
       Controles
     </button>
+
+    <!-- =========================
+         RESUMEN
+         ========================= -->
 
     <div
       class="dashboard-summary"
@@ -336,6 +416,10 @@ function formatCoordinate(
       </div>
     </div>
 
+    <!-- =========================
+         SIN DINOS
+         ========================= -->
+
     <div
       v-if="
         result.dinos.length === 0
@@ -353,6 +437,64 @@ function formatCoordinate(
     </div>
 
     <template v-else>
+
+      <!-- =========================
+           BUSCADOR
+           ========================= -->
+
+      <div
+        class="dino-search"
+      >
+        <div
+          class="dino-search-header"
+        >
+          <div>
+            <h2>
+              Buscar dinosaurio
+            </h2>
+
+            <span>
+              {{ filteredDinos.length }}
+              de
+              {{ result.dinos.length }}
+              dinos
+            </span>
+          </div>
+
+          <button
+            v-if="searchText"
+            type="button"
+            class="search-clear-button"
+            @click="clearSearch"
+          >
+            Limpiar
+          </button>
+        </div>
+
+        <div
+          class="search-input-wrapper"
+        >
+          <span
+            class="search-icon"
+          >
+            🔎
+          </span>
+
+          <input
+            v-model="searchText"
+            type="text"
+            class="dino-search-input"
+            placeholder="Buscar por nombre... Ej. pachy"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+      </div>
+
+      <!-- =========================
+           MAPAS / DINOS
+           ========================= -->
+
       <section
         v-for="[
           map,
@@ -388,7 +530,18 @@ function formatCoordinate(
               `${dino.name}-${dino.map}-${dino.latitude}-${dino.longitude}`
             "
             class="dino-card"
+            :class="{
+              selected:
+                isDinoSelected(dino)
+            }"
+            @click="
+              toggleDinoSelection(dino)
+            "
           >
+            <div
+              class="dino-card-accent"
+            ></div>
+
             <div
               class="dino-name-wrapper"
             >
@@ -414,14 +567,24 @@ function formatCoordinate(
               "
               class="dino-coordinates"
             >
-              Lat
+              <span>
+                LAT
+              </span>
+
               {{ formatCoordinate(
                 dino.latitude
               ) }}
 
-              ·
+              <span
+                class="coordinate-separator"
+              >
+                ·
+              </span>
 
-              Lon
+              <span>
+                LON
+              </span>
+
               {{ formatCoordinate(
                 dino.longitude
               ) }}
@@ -430,8 +593,42 @@ function formatCoordinate(
         </div>
       </section>
 
+      <!-- =========================
+           BÚSQUEDA SIN RESULTADOS
+           ========================= -->
+
       <div
         v-if="
+          filteredDinos.length === 0 &&
+          searchText
+        "
+        class="empty-state search-empty-state"
+      >
+        <strong>
+          No se encontraron dinos
+        </strong>
+
+        <span>
+          No hay ningún dinosaurio cuyo
+          nombre contenga
+          "{{ searchText }}"
+        </span>
+
+        <button
+          type="button"
+          @click="clearSearch"
+        >
+          Limpiar búsqueda
+        </button>
+      </div>
+
+      <!-- =========================
+           TODOS LOS MAPAS OCULTOS
+           ========================= -->
+
+      <div
+        v-if="
+          filteredDinos.length > 0 &&
           dinosByMap.length === 0
         "
         class="empty-filter-state"
@@ -447,6 +644,7 @@ function formatCoordinate(
           Mostrar todos
         </button>
       </div>
+
     </template>
 
   </section>

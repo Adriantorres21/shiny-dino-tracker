@@ -20,22 +20,22 @@ interface DinoEvent {
 }
 
 const TIME_REGEX =
-  /(?:###\s*)?Shiny\s+BotAPP\s+\*?[—–-]\*?\s*(\d{1,2}:\d{2})/gi
+  /(?:###\s\*)?Shiny\s+BotAPP\s*\*?[—–-]\*?\s*\*(\d{1,2}:\d{2})/gi
 
 const EVENT_START_REGEX =
   /A\s+Shiny\s+Dino\s+has\s+(spawned|despawned|been\s+killed|been\s+tamed)!/gi
 
 const SPAWN_DETAILS_REGEX =
-  /(?:\*\*)?\s*(?::\w+:\s*)?(.+?)\s+(?:\*\*)?has\s+spawned\s+at\s+Lat\s+(-?\d+(?:\.\d+)?)\s+Lon\s+(-?\d+(?:\.\d+)?)!/i
+  /(?:^|\r?\n)\s*\*{0,2}(.+?)\*{0,2}\s+has\s+spawned\s+at\s+Lat\s+(-?\d+(?:\.\d+)?)\s+Lon\s+(-?\d+(?:\.\d+)?)!/i
 
 const DESPAWN_DETAILS_REGEX =
-  /(?:\*\*)?\s*(?::\w+:\s*)?(.+?)\s+(?:\*\*)?has\s+despawned(?:\s+and\s+will\s+be\s+missed!)?/i
+  /(?:^|\r?\n)\s*\*{0,2}(.+?)\*{0,2}\s+has\s+despawned(?:\s+and\s+will\s+be\s+missed!)?/i
 
 const KILLED_DETAILS_REGEX =
-  /(?:\*\*)?\s*(?::\w+:\s*)?(.+?)\s+(?:\*\*)?has\s+been\s+killed/i
+  /(?:^|\r?\n)\s*\*{0,2}(.+?)\*{0,2}\s+has\s+been\s+killed(?:!|$)/i
 
 const TAMED_DETAILS_REGEX =
-  /(?:\*\*)?\s*(?::\w+:\s*)?(.+?)\s+(?:\*\*)?has\s+been\s+tamed(?:\s+by\s+.+?)?\s*(?:\(.+?\))?!/i
+  /(?:^|\r?\n)\s*\*{0,2}(.+?)\*{0,2}\s+has\s+been\s+tamed\s+by\s+(.+?)!/i
 
 const MAP_REGEX =
   /\*{0,2}\[([^\]]+)\]\*{0,2}/g
@@ -44,8 +44,12 @@ function getDiscordTimes(
   text: string
 ): string[] {
   return [
-    ...text.matchAll(TIME_REGEX),
-  ].map(match => match[1])
+    ...text.matchAll(
+      TIME_REGEX
+    ),
+  ].map(
+    match => match[1]
+  )
 }
 
 function getTimeForPosition(
@@ -53,7 +57,10 @@ function getTimeForPosition(
   position: number
 ): string {
   const textBefore =
-    text.slice(0, position)
+    text.slice(
+      0,
+      position
+    )
 
   const matches =
     [
@@ -62,7 +69,9 @@ function getTimeForPosition(
       ),
     ]
 
-  if (matches.length === 0) {
+  if (
+    matches.length === 0
+  ) {
     return ''
   }
 
@@ -81,7 +90,9 @@ function getMapFromEvent(
       ),
     ]
 
-  if (maps.length === 0) {
+  if (
+    maps.length === 0
+  ) {
     return ''
   }
 
@@ -99,10 +110,22 @@ function cleanDinoName(
   name: string
 ): string {
   return name
-    .replace(/\*\*/g, '')
-    .replace(/\*/g, '')
-    .replace(/:\w+:/g, '')
-    .replace(/\s+/g, ' ')
+    .replace(
+      /\*\*/g,
+      ''
+    )
+    .replace(
+      /\*/g,
+      ''
+    )
+    .replace(
+      /:\w+:/g,
+      ''
+    )
+    .replace(
+      /\s+/g,
+      ' '
+    )
     .trim()
 }
 
@@ -112,13 +135,22 @@ function parseEvent(
   end: number
 ): DinoEvent | null {
   const eventText =
-    text.slice(position, end)
+    text.slice(
+      position,
+      end
+    )
 
   const time =
     getTimeForPosition(
       text,
       position
     )
+
+  /*
+   * =========================
+   * SPAWN
+   * =========================
+   */
 
   const spawn =
     eventText.match(
@@ -130,18 +162,26 @@ function parseEvent(
       position,
       time,
       event: 'spawn',
-      name: cleanDinoName(
-        spawn[1]
-      ),
-      map: getMapFromEvent(
-        eventText
-      ),
+      name:
+        cleanDinoName(
+          spawn[1]
+        ),
+      map:
+        getMapFromEvent(
+          eventText
+        ),
       latitude:
         Number(spawn[2]),
       longitude:
         Number(spawn[3]),
     }
   }
+
+  /*
+   * =========================
+   * DESPAWN
+   * =========================
+   */
 
   const despawn =
     eventText.match(
@@ -153,14 +193,22 @@ function parseEvent(
       position,
       time,
       event: 'despawned',
-      name: cleanDinoName(
-        despawn[1]
-      ),
-      map: getMapFromEvent(
-        eventText
-      ),
+      name:
+        cleanDinoName(
+          despawn[1]
+        ),
+      map:
+        getMapFromEvent(
+          eventText
+        ),
     }
   }
+
+  /*
+   * =========================
+   * KILLED
+   * =========================
+   */
 
   const killed =
     eventText.match(
@@ -172,14 +220,22 @@ function parseEvent(
       position,
       time,
       event: 'killed',
-      name: cleanDinoName(
-        killed[1]
-      ),
-      map: getMapFromEvent(
-        eventText
-      ),
+      name:
+        cleanDinoName(
+          killed[1]
+        ),
+      map:
+        getMapFromEvent(
+          eventText
+        ),
     }
   }
+
+  /*
+   * =========================
+   * TAMED
+   * =========================
+   */
 
   const tamed =
     eventText.match(
@@ -191,12 +247,14 @@ function parseEvent(
       position,
       time,
       event: 'tamed',
-      name: cleanDinoName(
-        tamed[1]
-      ),
-      map: getMapFromEvent(
-        eventText
-      ),
+      name:
+        cleanDinoName(
+          tamed[1]
+        ),
+      map:
+        getMapFromEvent(
+          eventText
+        ),
     }
   }
 
@@ -231,8 +289,9 @@ function extractEvents(
       i + 1 <
       matches.length
         ? (
-            matches[i + 1]
-              .index ??
+            matches[
+              i + 1
+            ].index ??
             text.length
           )
         : text.length
@@ -245,7 +304,9 @@ function extractEvents(
       )
 
     if (event) {
-      events.push(event)
+      events.push(
+        event
+      )
     }
   }
 
@@ -280,14 +341,21 @@ function removeDuplicateEvents(
     const event of events
   ) {
     const key =
-      getEventKey(event)
+      getEventKey(
+        event
+      )
 
-    if (seen.has(key)) {
+    if (
+      seen.has(key)
+    ) {
       continue
     }
 
     seen.add(key)
-    unique.push(event)
+
+    unique.push(
+      event
+    )
   }
 
   return unique
@@ -315,37 +383,59 @@ export function parseDiscordText(
   text: string
 ): ParseResult {
   const discordTimes =
-    getDiscordTimes(text)
+    getDiscordTimes(
+      text
+    )
 
   const extractedEvents =
-    extractEvents(text)
+    extractEvents(
+      text
+    )
 
   const events =
     removeDuplicateEvents(
       extractedEvents
     )
 
-  events.sort((a, b) => {
-    const timeA =
-      timeToMinutes(a.time)
+  /*
+   * Ordenamos cronológicamente.
+   * Si dos eventos tienen la misma hora,
+   * conservamos el orden original del mensaje.
+   */
 
-    const timeB =
-      timeToMinutes(b.time)
+  events.sort(
+    (a, b) => {
+      const timeA =
+        timeToMinutes(
+          a.time
+        )
 
-    if (
-      timeA === timeB
-    ) {
+      const timeB =
+        timeToMinutes(
+          b.time
+        )
+
+      if (
+        timeA === timeB
+      ) {
+        return (
+          a.position -
+          b.position
+        )
+      }
+
       return (
-        a.position -
-        b.position
+        timeA -
+        timeB
       )
     }
-
-    return timeA - timeB
-  })
+  )
 
   const activeDinos =
-    new Map<string, DinoEvent>()
+    new Map<
+      string,
+      DinoEvent
+    >()
 
   for (
     const event of events
@@ -354,6 +444,10 @@ export function parseDiscordText(
       `${event.name}|${event.map}`
         .toLowerCase()
 
+    /*
+     * Un spawn agrega/reemplaza
+     * el dino activo.
+     */
     if (
       event.event === 'spawn'
     ) {
@@ -361,31 +455,49 @@ export function parseDiscordText(
         key,
         event
       )
-    } else {
-      activeDinos.delete(key)
+
+      continue
     }
+
+    /*
+     * Despawn, killed y tamed
+     * eliminan el dino de activos.
+     */
+    activeDinos.delete(
+      key
+    )
   }
 
   const dinos:
     SpawnedDino[] =
-    [...activeDinos.values()]
-      .map(event => ({
-        name: event.name,
-        map: event.map,
+    [
+      ...activeDinos.values()
+    ].map(
+      event => ({
+        name:
+          event.name,
+        map:
+          event.map,
         latitude:
           event.latitude,
         longitude:
           event.longitude,
-      }))
+      })
+    )
 
   return {
     dinos,
+
     firstTime:
-      discordTimes[0] ?? '',
+      discordTimes[0] ??
+      '',
+
     lastTime:
       discordTimes[
         discordTimes.length - 1
-      ] ?? '',
+      ] ??
+      '',
+
     totalMessages:
       events.length,
   }
