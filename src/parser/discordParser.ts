@@ -7,6 +7,7 @@ type DinoEventType =
   | 'spawn'
   | 'despawned'
   | 'killed'
+  | 'tamed'
 
 interface DinoEvent {
   position: number
@@ -22,7 +23,7 @@ const TIME_REGEX =
   /(?:###\s*)?Shiny\s+BotAPP\s+\*?[—–-]\*?\s*(\d{1,2}:\d{2})/gi
 
 const EVENT_START_REGEX =
-  /A\s+Shiny\s+Dino\s+has\s+(spawned|despawned|been\s+killed)!/gi
+  /A\s+Shiny\s+Dino\s+has\s+(spawned|despawned|been\s+killed|been\s+tamed)!/gi
 
 const SPAWN_DETAILS_REGEX =
   /(?:\*\*)?\s*(?::\w+:\s*)?(.+?)\s+(?:\*\*)?has\s+spawned\s+at\s+Lat\s+(-?\d+(?:\.\d+)?)\s+Lon\s+(-?\d+(?:\.\d+)?)!/i
@@ -32,6 +33,9 @@ const DESPAWN_DETAILS_REGEX =
 
 const KILLED_DETAILS_REGEX =
   /(?:\*\*)?\s*(?::\w+:\s*)?(.+?)\s+(?:\*\*)?has\s+been\s+killed/i
+
+const TAMED_DETAILS_REGEX =
+  /(?:\*\*)?\s*(?::\w+:\s*)?(.+?)\s+(?:\*\*)?has\s+been\s+tamed(?:\s+by\s+.+?)?\s*(?:\(.+?\))?!/i
 
 const MAP_REGEX =
   /\*{0,2}\[([^\]]+)\]\*{0,2}/g
@@ -170,6 +174,25 @@ function parseEvent(
       event: 'killed',
       name: cleanDinoName(
         killed[1]
+      ),
+      map: getMapFromEvent(
+        eventText
+      ),
+    }
+  }
+
+  const tamed =
+    eventText.match(
+      TAMED_DETAILS_REGEX
+    )
+
+  if (tamed) {
+    return {
+      position,
+      time,
+      event: 'tamed',
+      name: cleanDinoName(
+        tamed[1]
       ),
       map: getMapFromEvent(
         eventText
