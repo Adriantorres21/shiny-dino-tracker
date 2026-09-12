@@ -968,3 +968,68 @@ body {
     padding: 9px;
   }
 }
+
+/* =========================
+   DINO NAME TOOLTIP
+   ========================= */
+
+.dino-name-wrapper {
+  position: relative;
+  min-width: 0;
+}
+
+.dino-name-tooltip {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 7px);
+  z-index: 50;
+
+  max-width: min(420px, 70vw);
+
+  padding: 7px 9px;
+
+  border: 1px solid #343b48;
+  border-radius: 6px;
+
+  background: #20242c;
+  color: #f3f4f6;
+
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+
+  white-space: normal;
+  overflow-wrap: anywhere;
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.4);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translateY(3px);
+
+  transition:
+    opacity 0.15s ease,
+    visibility 0.15s ease,
+    transform 0.15s ease;
+}
+
+.dino-name-tooltip::after {
+  content: "";
+
+  position: absolute;
+  left: 12px;
+  top: 100%;
+
+  border: 5px solid transparent;
+  border-top-color: #343b48;
+}
+
+.dino-name-wrapper:hover
+  .dino-name-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}

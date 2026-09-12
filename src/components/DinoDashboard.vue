@@ -389,12 +389,21 @@ function formatCoordinate(
             "
             class="dino-card"
           >
-            <h3
-              class="dino-name"
-              :title="dino.name"
+            <div
+              class="dino-name-wrapper"
             >
-              {{ dino.name }}
-            </h3>
+              <h3
+                class="dino-name"
+              >
+                {{ dino.name }}
+              </h3>
+
+              <div
+                class="dino-name-tooltip"
+              >
+                {{ dino.name }}
+              </div>
+            </div>
 
             <div
               v-if="
