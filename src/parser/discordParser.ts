@@ -20,22 +20,22 @@ interface DinoEvent {
 }
 
 const TIME_REGEX =
-  /(?:###\s\*)?Shiny\s+BotAPP\s*\*?[—–-]\*?\s*\*(\d{1,2}:\d{2})/gi
+  /(?:###\s*\*?)?Shiny\s+Bot\s*APP\s*\*?[—–-]\*?\s*(?:\*)?(\d{1,2}:\d{2})/gi
 
 const EVENT_START_REGEX =
-  /A\s+Shiny\s+Dino\s+has\s+(spawned|despawned|been\s+killed|been\s+tamed)!/gi
+  /A\s+Shiny\s+Dino\s+has\s+(spawned|despawned|(?:been\s+)?killed|(?:been\s+)?tamed)!\s*/gi
 
 const SPAWN_DETAILS_REGEX =
-  /(?:^|\r?\n)\s*\*{0,2}(.+?)\*{0,2}\s+has\s+spawned\s+at\s+Lat\s+(-?\d+(?:\.\d+)?)\s+Lon\s+(-?\d+(?:\.\d+)?)!/i
+  /^(.+?)\s+has\s+spawned\s+at\s+Lat\s+(-?\d+(?:\.\d+)?)\s+Lon\s+(-?\d+(?:\.\d+)?)!/i
 
 const DESPAWN_DETAILS_REGEX =
-  /(?:^|\r?\n)\s*\*{0,2}(.+?)\*{0,2}\s+has\s+despawned(?:\s+and\s+will\s+be\s+missed!)?/i
+  /^(.+?)\s+has\s+despawned(?:\s+and\s+will\s+be\s+missed!)?/i
 
 const KILLED_DETAILS_REGEX =
-  /(?:^|\r?\n)\s*\*{0,2}(.+?)\*{0,2}\s+has\s+been\s+killed(?:!|$)/i
+  /^(.+?)\s+has\s+(?:been\s+)?killed(?:!|$)/i
 
 const TAMED_DETAILS_REGEX =
-  /(?:^|\r?\n)\s*\*{0,2}(.+?)\*{0,2}\s+has\s+been\s+tamed\s+by\s+(.+?)!/i
+  /^(.+?)\s+has\s+(?:been\s+)?tamed\s+by\s+(.+?)!/i
 
 const MAP_REGEX =
   /\*{0,2}\[([^\]]+)\]\*{0,2}/g
@@ -140,11 +140,23 @@ function parseEvent(
       end
     )
 
+  const body =
+    eventText
+      .replace(
+        /^[\s\S]*?A\s+Shiny\s+Dino\s+has\s+(?:spawned|despawned|(?:been\s+)?killed|(?:been\s+)?tamed)!\s*/i,
+        ''
+      )
+      .trim()
+
   const time =
     getTimeForPosition(
       text,
       position
     )
+
+  if (!body) {
+    return null
+  }
 
   /*
    * =========================
@@ -153,7 +165,7 @@ function parseEvent(
    */
 
   const spawn =
-    eventText.match(
+    body.match(
       SPAWN_DETAILS_REGEX
     )
 
@@ -184,7 +196,7 @@ function parseEvent(
    */
 
   const despawn =
-    eventText.match(
+    body.match(
       DESPAWN_DETAILS_REGEX
     )
 
@@ -211,7 +223,7 @@ function parseEvent(
    */
 
   const killed =
-    eventText.match(
+    body.match(
       KILLED_DETAILS_REGEX
     )
 
@@ -238,7 +250,7 @@ function parseEvent(
    */
 
   const tamed =
-    eventText.match(
+    body.match(
       TAMED_DETAILS_REGEX
     )
 
@@ -313,14 +325,41 @@ function extractEvents(
   return events
 }
 
+function normalizeIdentity(
+  value: string
+): string {
+  return value
+    .replace(
+      /\s+/g,
+      ' '
+    )
+    .trim()
+    .toLowerCase()
+}
+
+function getDinoIdentity(
+  name: string,
+  map: string
+): string {
+  return [
+    normalizeIdentity(name),
+    normalizeIdentity(map),
+  ]
+    .join('|')
+}
+
 function getEventKey(
   event: DinoEvent
 ): string {
   return [
     event.event,
     event.time,
-    event.name,
-    event.map,
+    normalizeIdentity(
+      event.name
+    ),
+    normalizeIdentity(
+      event.map
+    ),
     event.latitude ?? '',
     event.longitude ?? '',
   ]
@@ -441,8 +480,10 @@ export function parseDiscordText(
     const event of events
   ) {
     const key =
-      `${event.name}|${event.map}`
-        .toLowerCase()
+      getDinoIdentity(
+        event.name,
+        event.map
+      )
 
     /*
      * Un spawn agrega/reemplaza
